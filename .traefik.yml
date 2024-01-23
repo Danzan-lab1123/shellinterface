@@ -2,7 +2,7 @@ displayName: Demo Plugin
 type: middleware
 iconPath: .assets/icon.png
 
-import: github.com/traefik/plugindemo
+import: github.com/Danzan-lab1123/remoteplug
 
 summary: '[Demo] Add Request Header'
 
