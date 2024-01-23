@@ -1,4 +1,4 @@
-package plugindemo_test
+package remoteplug_test
 
 import (
 	"context"
