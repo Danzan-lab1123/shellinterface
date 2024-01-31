@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  reverse-proxy:
+    image: traefik:hochschule-pforzheim-v0.0.1
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --experimental.localPlugins.remoteplug.moduleName=github.com/Danzan-lab1123/remoteplug
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/plugins-local/src/github.com/Danzan-lab1123/remoteplug/
+
+  whoami:
+    image: traefik/whoami
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+      - "traefik.http.routers.whoami.middlewares=remoteplugmm"
+      - "traefik.http.middlewares.remoteplugmm.plugin.remoteplug.headers.serviceName=w_nginx"
+      - "traefik.http.middlewares.remoteplugmm.plugin.remoteplug.headers.serviceMax=33"
+      - "traefik.http.middlewares.remoteplugmm.plugin.remoteplug.headers.serviceMin=5"
+      - "traefik.http.routers.whoami.service=whoami@docker"
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
