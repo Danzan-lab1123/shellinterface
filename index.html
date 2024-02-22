@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!Webseite nicht der Leistung der Abschlussarbeit!!>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: Arial;
+                padding: 10px;
+                background: #FFE699;
+            }
+
+            .header {
+                padding: 30px;
+                text-align: left;
+                background: white;
+            }
+
+            .header h1 {
+                font-size: 50px;
+            }
+
+            .topnav {
+                padding: 30px;
+                overflow: hidden;
+                background-color: #333;
+            }
+
+            .topnav a {
+                float: left;
+                display: block;
+                color: #f2f2f2;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
+
+            .topnav a:hover {
+                background-color: #ddd;
+                color: black;
+            }
+
+            .leftcolumn {
+                float: left;
+                width: 75%;
+            }
+
+            .rightcolumn {
+                float: left;
+                width: 25%;
+                background-color: #f1f1f1;
+                padding-left: 20px;
+            }
+
+            .fakeimg {
+                background-color: #aaa;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .card {
+                background-color: white;
+                padding: 20px;
+                margin-top: 20px;
+            }
+
+            .row::after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            .footer {
+                padding: 20px;
+                text-align: left;
+                background-color: #333;
+                margin-top: 20px;
+            }
+
+            @media screen and (max-width: 800px) {
+
+                .leftcolumn,
+                .rightcolumn {
+                    width: 100%;
+                    padding: 0;
+                }
+            }
+            
+            @media screen and (max-width: 400px) {
+                .topnav a {
+                    float: none;
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>TH4999 Thesis</h1>
+            <p>Abschlussarbeit zur Erlangung des Akademischen Grades: Bachelor of Science <br>Daniel Zander 321310</p>
+        </div>
+        <div class="topnav">
+            <p style="color: FFC000">Integration eines automatisierten Verfahrens zum Deployment einer Applikation und dessen Rücknahme auf einem Raspberry-Pi Clusters</p>
+        </div>
+        <div class="row">
+            <div class="leftcolumn">
+                <div class="card">
+                    <h2>Container nach Bedarf</h2>
+                    <img src="html5.gif" alt="Darstellung der genrellen Idee über funktiosnweise der Skalierung" style="width: 600px; height:250px;">
+                    <p>Inhalt:</p>
+                    <p>Die Automatisierung der Bereitstellung von Containeranwendungen während einer Serviceanfrage und dem analogen Runternehmen innerhalb des Datenzentrums der
+                        Hochschule.</p>
+                </div>
+            </div>
+            <div class="rightcolumn" style="background: #FFE699">
+                <div class="card">
+                    <h3>Für die Umsetzung verwendet:</h3>
+                    <ul>
+                        <li>Docker Compose</li>
+                        <li>Traefik Proxy - Middleware</li>
+                        <li>Bash - Skripte</li>
+                    </ul> 
+                </div>
+
+                <div class="card">
+                    <h3>Repositorium</h3>
+                    <a href="url">GitHub</a>
+                    <br><br>
+                    <a href="url">Docker Hub</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p style="color: #F8F8F8">© 2024</p><p id="html-datum" style="color: FFC000"></p>
+
+            <script> var time = new Date();
+                var datum = time.toLocaleString();
+                document.getElementById("html-datum").innerHTML = datum;
+            </script>
+        </div>
+
+    </body>
+</html>
+
