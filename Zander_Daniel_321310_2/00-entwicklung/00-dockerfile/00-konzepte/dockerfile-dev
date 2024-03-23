@@ -1,0 +1,11 @@
+FROM traefik:v2.10.7
+RUN apk update && apk upgrade
+RUN set -ex && apk --no-cache add sudo
+RUN apk add docker
+RUN apk add vim
+RUN apk add go
+RUN export GOPATH=/home/wsl/go/bin
+RUN export PATH=$PATH:/home/wsl/.local/bin:$GOPATH
+RUN go mod init github.com/hochschule-pforzheim/bachelor-thesis-321310
+COPY ./eventDrivenScaler.sh /
+RUN chmod u+x ./eventDrivenScaler.sh

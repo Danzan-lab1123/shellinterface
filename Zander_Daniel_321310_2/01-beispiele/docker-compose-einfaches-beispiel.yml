@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  traefik-hochschule-pforzheim:
+    image: danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:traefik-hochschule-pforzheim-v2.0
+    deploy:
+     replicas: 1
+     placement:
+       constraints: [node.role == manager]
+    ports:
+      - "80:80"
+      - "8080:8080"
+    command:
+      - --log.level=INFO
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.swarmMode=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik
+      - --entrypoints.web.address=:80
+      - --experimental.localPlugins.shellinterface.moduleName=github.com/hochschule-pforzheim/bachelor-thesis-321310/shellinterface
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
+
+  nginx:
+   image: nginx:latest
+   deploy:
+    placement:
+       constraints: [node.role == worker]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=Path(`/`)"
+      - "traefik.http.routers.nginx.entrypoints=web"
+      - "traefik.http.routers.nginx.middlewares=shellinterfacemiddleware"
+      - "traefik.http.middlewares.shellinterfacemiddleware.plugin.shellinterface.headers.serviceName=stack02_nginx"
+      - "traefik.http.middlewares.shellinterfacemiddleware.plugin.shellinterface.headers.serviceMax=10"
+      - "traefik.http.middlewares.shellinterfacemiddleware.plugin.shellinterface.headers.serviceMin=3"
+      - "traefik.http.middlewares.shellinterfacemiddleware.plugin.shellinterface.headers.requestCounterCap=3"
+      - "traefik.http.middlewares.shellinterfacemiddleware.plugin.shellinterface.headers.serviceTimerCap=90"
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+   networks:
+     - default
+     - traefik
+
+networks:
+  traefik:
+    driver: overlay
+    attachable: true
+    name: traefik

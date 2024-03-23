@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  traefik:
+    image: danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:traefik-hochschule-pforzheim-produktiv
+    deploy:
+     replicas: 1
+     placement:
+       constraints: [node.hostname == clusterpi01]
+    ports:
+      - "6060:8080"
+      - "6061:9090"
+      - "6062:9091"
+      - "6063:9092"
+      - "6064:9093"
+    command:
+      - --log.level=INFO
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.swarmMode=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik
+      - --entrypoints.app.address=:9090
+      - --entrypoints.whoamitest.address=:9091
+      - --entrypoints.whoami.address=:9092
+      - --entrypoints.redirect.address=:9093
+      - --experimental.localPlugins.shellinterface.moduleName=github.com/hochschule-pforzheim/bachelor-thesis-321310/shellinterface
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
+networks:
+  traefik:
+    name: traefik
+    driver: overlay
+    attachable: true

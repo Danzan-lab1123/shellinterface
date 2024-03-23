@@ -1,0 +1,28 @@
+pilot:
+  token: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxx
+
+api:
+  dashboard: true
+  insecure: true
+
+
+entryPoints:
+  tcp:
+    address: ":5432"
+    forwardedHeaders:
+      insecure: true
+
+
+providers:
+  docker:
+    swarmMode: true
+    exposedByDefault: false
+  file:
+    filename: "dynamic.yml"
+    watch: true
+    
+experimental:
+  localPlugins:
+    eventdrivendeployer:
+      moduleName: "github.com/hochschule-pforzheim/eventdrivendeployment"
+    

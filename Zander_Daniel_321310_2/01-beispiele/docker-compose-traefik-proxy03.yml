@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  r-pgadmin:
+   image: danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:redirect
+   environment:
+    REDIRECT_TARGET: http://141.47.80.170:6066
+   deploy:
+     replicas: 1
+     placement:
+       constraints: [node.hostname == clusterpi01]
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin4.entrypoints=redirect"
+      - "traefik.http.routers.pgadmin4.rule=Path(`/`) || Host(`redirect.docker.localhost`)"
+      - "traefik.http.routers.pgadmin4.middlewares=shell-pgadmin"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceName=traefik-proxy03_pgadmin"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceMax=20"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceMin=3"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.requestCounterCap=1"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceTimerCap=900"
+      - "traefik.http.services.pgadmin4.loadbalancer.server.port=80"
+   networks:
+     - default
+     - traefik
+  pgadmin:
+    image: danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:pgadmin-serverjson
+    ports:
+     - "6066:80"
+    environment:
+     PGADMIN_DEFAULT_EMAIL: hspf@beispiel.com
+     PGADMIN_DEFAULT_PASSWORD: passwort
+    deploy:
+     placement:
+       max_replicas_per_node: 1
+       constraints: [node.role == worker]
+     replicas: 1
+networks:
+  traefik:
+    external: true

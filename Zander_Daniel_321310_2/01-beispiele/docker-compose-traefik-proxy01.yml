@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+
+  alpinelinux:
+   image: danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:alpinelinux-darkhttpd
+   deploy:
+    placement:
+       constraints: [node.role == worker]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alpinelinux.rule=Path(`/`)"
+      - "traefik.http.routers.alpinelinux.entrypoints=app"
+      - "traefik.http.routers.alpinelinux.middlewares=shell-alpinelinux"
+      - "traefik.http.middlewares.shell-alpinelinux.plugin.shellinterface.headers.serviceName=traefik-proxy01_alpinelinux"
+      - "traefik.http.middlewares.shell-alpinelinux.plugin.shellinterface.headers.serviceMax=15"
+      - "traefik.http.middlewares.shell-alpinelinux.plugin.shellinterface.headers.serviceMin=5"
+      - "traefik.http.middlewares.shell-alpinelinux.plugin.shellinterface.headers.requestCounterCap=20"
+      - "traefik.http.middlewares.shell-alpinelinux.plugin.shellinterface.headers.serviceTimerCap=300"
+      - "traefik.http.services.alpinelinux.loadbalancer.server.port=80"
+   networks:
+     - default
+     - traefik
+  whaomi:
+   image: ghcr.io/traefik/whoami:v1.10.1
+   deploy:
+    placement:
+       constraints: [node.role == worker]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Path(`/`)"
+      - "traefik.http.routers.whoami.entrypoints=whoami"
+      - "traefik.http.routers.whoami.middlewares=shell-whoami"
+      - "traefik.http.middlewares.shell-whoami.plugin.shellinterface.headers.serviceName=traefik-proxy01_whaomi"
+      - "traefik.http.middlewares.shell-whoami.plugin.shellinterface.headers.serviceMax=15"
+      - "traefik.http.middlewares.shell-whoami.plugin.shellinterface.headers.serviceMin=5"
+      - "traefik.http.middlewares.shell-whoami.plugin.shellinterface.headers.requestCounterCap=1"
+      - "traefik.http.middlewares.shell-whoami.plugin.shellinterface.headers.serviceTimerCap=25"
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+   networks:
+     - default
+     - traefik
+networks:
+  traefik:
+     external: true

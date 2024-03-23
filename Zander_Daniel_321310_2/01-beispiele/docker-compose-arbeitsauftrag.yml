@@ -1,0 +1,91 @@
+# deployment der auftragsstellung
+version: "3.8"
+services:
+
+# konfigurationen des traefik-proxy server
+traefik:
+    image:-danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:traefik-hochschule-pforzheim-produktiv
+    deploy:
+     replicas: 1
+     placement:
+       constraints: [node.role == manager]
+    ports:
+      - "80:80"
+      - "6060:8080"
+      - "6061:6061"
+    command:
+      - --log.level=INFO
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.swarmMode=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik
+      - --entrypoints.redirect.address=:6061
+      ---experi-mental.localPlugins.shellinterface.moduleName=github.com/hochschule-pforzheim/bachelor-thesis-321310/shellinterface
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
+
+# konfigurationen des pgadmin:
+    image:-danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:pgadmin-serverjson
+    ports:
+     - "6062:80"
+    environment:
+     PGADMIN_DEFAULT_EMAIL: hspf@beispiel.com
+     PGADMIN_DEFAULT_PASSWORD: passwort
+     PGADMIN_CONFIG_SERVER_MODE: 'False'
+     PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+     PGADMIN_CONFIG_SERVER_MODE: 'False'
+     PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+     PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
+     PGADMIN_CONFIG_WTF_CSRF_CHECK_DEFAULT: 'False'
+     PGADMIN_CONFIG_WTF_CSRF_ENABLED: 'False'
+    deploy:
+     placement:
+       max_replicas_per_node: 1
+       constraints: [node.role == worker]
+     replicas: 1
+
+# konfigurationen der dockerdatabase 
+  mondial-no-perl:
+   image:-danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:mondial-no-perl
+   ports:
+    - "5432:5432"
+   environment:
+     POSTGRES_PASSWORD: admin
+   deploy:
+      mode: global
+      placement:
+        constraints: [node.role == worker]
+
+# konfigurationen des nginx-servers für umlenkung der anfrage:
+  r-pgadmin:
+   image:-danzandoc1123/winter_2023-the4999-abschlussarbeit-bachelor_of_science-zander_daniel:redirect
+   environment:
+    REDIRECT_TARGET: http://${IP}:6062
+   deploy:
+     replicas: 1
+     placement:
+       constraints: [node.role == manager]
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin4.entrypoints=redirect"
+      - "traefik.http.routers.pgadmin4.rule=Path(`/`) || Host(`redirect.docker.localhost`)"
+      - "traefik.http.routers.pgadmin4.middlewares=shell-pgadmin"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceName=proxy01_pgadmin"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceMax=20"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceMin=3"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.requestCounterCap=1"
+      - "traefik.http.middlewares.shell-pgadmin.plugin.shellinterface.headers.serviceTimerCap=450"
+      - "traefik.http.services.pgadmin4.loadbalancer.server.port=80"
+   networks:
+     - default
+     - traefik
+
+# definition des netzwerkes:
+networks:
+  traefik:
+    name: traefik
+    driver: overlay
+    attachable: true

@@ -1,0 +1,9 @@
+displayName: Demo-Eventdrivendeployer
+type: middleware
+
+import: github.com/hochschule-pforzheim/bachelor-thesis-321310
+
+summary: '[Demo] '
+
+testData:
+ Foo: Bar

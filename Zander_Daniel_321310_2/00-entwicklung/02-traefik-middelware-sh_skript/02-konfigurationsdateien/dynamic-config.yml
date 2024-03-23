@@ -1,0 +1,23 @@
+tcp:
+  routers:
+    postgres-router:
+      rule: host(`demo.localhost`)
+      service: service-foo
+      entryPoints:
+        - tcp
+      middlewares:
+        - eventdrivendeployer
+      service: "mondial"
+
+  services:
+   mondial:
+      loadBalancer:
+        servers:
+          - address: 0.0.0.0:5432
+  
+  middlewares:
+    eventdrivendeployer:
+      plugin:
+        example:
+          headers:
+            Foo: Bar

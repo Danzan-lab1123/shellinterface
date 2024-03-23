@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  whoamit:
+   image: ghcr.io/traefik/whoami:v1.10.1
+   deploy:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoamit.rule=Path(`/`)"
+      - "traefik.http.routers.whoamit.entrypoints=whoamitest"
+      - "traefik.http.routers.whoamit.middlewares=shell-whoami-test"
+      - "traefik.http.middlewares.shell-whoami-test.plugin.shellinterface.headers.serviceName=traefik-proxy02_whoamit"
+      - "traefik.http.middlewares.shell-whoami-test.plugin.shellinterface.headers.serviceMax=15"
+      - "traefik.http.middlewares.shell-whoami-test.plugin.shellinterface.headers.serviceMin=5"
+      - "traefik.http.middlewares.shell-whoami-test.plugin.shellinterface.headers.requestCounterCap=5"
+      - "traefik.http.middlewares.shell-whoami-test.plugin.shellinterface.headers.serviceTimerCap=150"
+      - "traefik.http.services.whoamit.loadbalancer.server.port=80"
+   networks:
+     - default
+     - traefik
+networks:
+  traefik:
+    external: true

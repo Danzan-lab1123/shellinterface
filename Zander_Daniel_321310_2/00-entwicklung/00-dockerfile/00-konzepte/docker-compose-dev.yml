@@ -1,0 +1,69 @@
+version: "3.8"
+
+#daniel: docker-compose.yml um die abhängigkeiten zwischen
+#traefik-proxy und dockerdatbase zu bestimmen
+services:
+
+#daniel:konfigurationen des traefik-proxy server
+  traefik:
+    image: traefik:v2.10.7
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "5432:5432"
+      - "443:443"
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.network=proxy
+      - --providers.docker.watch=true
+      - --providers.docker.swarmMode=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.db.address=:5433
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role==manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.mydashboard.rule=Host(`traefik.example.com`)
+        - traefik.http.routers.mydashboard.service=api@internal
+
+#daniel:konfigurationen der dockerdatabase server hier mondial
+  mondial:
+    image: mondial-no-perl
+    environment:
+      - POSTGRES_PASSWORD="admin"
+    depends_on:
+      - traefik
+    networks:
+      - proxy
+    deploy:
+     placement:
+       max_replicas_per_node: 1
+       constraints:
+          - node.role==worker
+     replicas: 1
+	 
+#daniel:bestimmung abhängigkeiten zum traefik-proxy server
+     labels:
+       - 'traefik.enable=true'
+       - 'traefik.tcp.routers.mondial.rule=HostSNI(`*`)'
+       - 'traefik.tcp.routers.mondial.entryPoints=db'
+       - 'traefik.tcp.middlewares.mm.inflightconn.amount=10'
+       - 'traefik.tcp.routers.mondial.middlewares=mm@docker'
+       - 'traefik.tcp.services.mondial.loadbalancer.server.port=5432'
+
+#daniel:definition gemeinsames netzwerk
+networks:
+  proxy:
+    name: proxy
+    driver: overlay
+    attachable: true		  

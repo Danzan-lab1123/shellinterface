@@ -1,0 +1,12 @@
+displayName: Bachelor-thesis-321310-Shellinterface
+type: middleware
+
+import: github.com/hochschule-pforzheim/bachelor-thesis-321310/shellinterface
+summary: '[Integration eines automatisierten Verfahrens zum Deployment einer Applikation und dessen Rücknahme auf einem Raspberry-Pi Clusters ] Die Automatisierung der Bereitstellung von Containeranwendungen während einer Serviceanfrage und dem analogen Runternehmen innerhalb des Datenzentrums der Hochschule'
+
+testData:
+  Headers:
+    serviceName: stackname_servicename
+    serviceMax: "30"
+    serviceMin: "5"
+
